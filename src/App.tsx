@@ -1,102 +1,14 @@
-import {
-  BarChart3,
-  Bell,
-  ChevronLeft,
-  ChevronRight,
-  Database,
-  FileText,
-  Folder,
-  Home,
-  type LucideIcon,
-} from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
+import { drawerData, type DrawerItem } from '@/constants';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/drawer';
-
-type DrawerData = {
-  title: string;
-  icon: LucideIcon;
-  path: string;
-  children?: DrawerData[];
-};
-
-export const drawerData: DrawerData[] = [
-  {
-    title: 'Dashboard',
-    icon: Home,
-    path: '/dashboard',
-  },
-  {
-    title: 'Projects',
-    icon: Folder,
-    path: '/',
-    children: [
-      {
-        title: 'Frontend',
-        icon: FileText,
-        path: '/',
-        children: [
-          {
-            icon: FileText,
-            title: 'React App',
-            path: '/projects/frontend/react',
-          },
-          {
-            icon: FileText,
-            title: 'Next.js Site',
-            path: '/projects/frontend/nextjs',
-          },
-        ],
-      },
-      {
-        title: 'Backend',
-        icon: Database,
-        path: '/',
-        children: [
-          {
-            icon: FileText,
-            title: 'API Server',
-            path: '/projects/backend/api',
-          },
-          {
-            icon: FileText,
-            title: 'Auth Service',
-            path: '/projects/backend/auth',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Analytics',
-    icon: BarChart3,
-    path: '/',
-    children: [
-      {
-        icon: FileText,
-        title: 'Overview',
-        path: '/analytics/overview',
-      },
-      {
-        icon: FileText,
-        title: 'User Stats',
-        path: '/analytics/users',
-      },
-    ],
-  },
-  {
-    title: 'Notifications',
-    icon: Bell,
-    path: '/notifications',
-  },
-];
+import { AnimatePresence, motion } from 'motion/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function App() {
-  const [stack, setStack] = useState([drawerData]);
+  const [stack, setStack] = useState<DrawerItem[][]>([drawerData]);
+  const currentLevel = stack.at(-1);
 
-  const currentLevel = stack[stack.length - 1];
-
-  const goNext = (item: DrawerData) => {
+  const goNext = (item: DrawerItem) => {
     if (item.children) {
       setStack((prev) => [...prev, item.children!]);
     }
@@ -107,6 +19,10 @@ export default function App() {
       setStack((prev) => prev.slice(0, -1));
     }
   };
+
+  if (!currentLevel) {
+    return null;
+  }
 
   return (
     <div className="border mx-auto w-full flex items-center min-h-svh justify-center">
@@ -133,7 +49,6 @@ export default function App() {
                 )}
               </div>
               <motion.div
-                key={stack.length}
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -100, opacity: 0 }}
@@ -155,7 +70,7 @@ export default function App() {
                       <div>
                         {item.title}
                         <p className="text-muted-foreground/70">
-                          Lorem ipsum dolor sit amet.
+                          {item.description}
                         </p>
                       </div>
                     </span>
